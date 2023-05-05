@@ -1,0 +1,262 @@
+/* Simple +/-/* expression language; parser evaluates constant expressions on the fly*/
+/**
+ *  Package and Import Specifications
+ */
+import java_cup.runtime.*;
+
+/**
+ *  Usercode Components
+ */
+parser code {:
+    // Connect this parser to a scanner!
+    Scanner s;
+    Parser(Scanner s){ this.s=s; }
+:}
+
+/* define how to connect to the scanner! */
+scan with {: return s.next_token(); :};
+
+/**
+ *  Symbol Lists
+ */
+
+/* Terminals (tokens returned by the scanner). */
+
+/*  Non terminals */
+
+terminal  LPAREN,RPAREN,LBRACE,RBRACE,STRING_LITERAL,IDENTIFIER,COMMA,PLUS,IF,PREFIX,ELSE,REVERSE; 
+non terminal programme,functionDefinition,function,functionCode,darguments,identifierType,concatenation,functionCall,call,carguments,type,printcall,ifstatement,expression;
+non terminal functionCallufunction,farguments,ftype,reverse,concatenationMain,ifstatementMain,expressionMain,reverseMain,main;
+
+precedence left IF;
+precedence left PLUS;
+precedence left REVERSE;
+
+programme ::= functionDefinition: fd functionCall: fc main:m{:  System.out.println("import java.io.*;");
+                                                                System.out.println("\n\npublic class Main {");
+                                                                System.out.println("\t public static void main(String[] args) {");
+                                                                System.out.println(fc);
+                                                                System.out.println("\n\t\t"+ m);
+                                                                System.out.println("\t}");
+                                                                System.out.println(fd);
+                                                                System.out.println("}");:}
+        
+        | functionDefinition: fd main: m  functionCall: fc{:    System.out.println("import java.io.*;");
+                                                                System.out.println("\n\npublic class Main {");
+                                                                System.out.println("\t public static void main(String[] args) {");
+                                                                System.out.println("\t "+ m);
+                                                                System.out.println(fc);
+                                                                System.out.println("\t}");
+                                                                System.out.println(fd);
+                                                                System.out.println("}");:}
+
+        | main: m functionDefinition: fd functionCall : fc {:   System.out.println("import java.io.*;");
+                                                                System.out.println("\n\npublic class Main {");
+                                                                System.out.println("\t public static void main(String[] args) {");
+                                                                System.out.println("\t "+ m);
+                                                                System.out.println(fc);
+                                                                System.out.println("\t}");
+                                                                System.out.println(fd);
+                                                                System.out.println("}"); :}
+        
+        | main :m functionCall:fc functionDefinition:fd {:      System.out.println("import java.io.*;");
+                                                                System.out.println("\n\npublic class Main {");
+                                                                System.out.println("\t public static void main(String[] args) {");
+                                                                System.out.println("\t"+m);
+                                                                System.out.println(fc);
+                                                                System.out.println("\t}");
+                                                                System.out.println(fd);
+                                                                System.out.println("}");:}
+        
+        
+        | functionDefinition:fd functionCall:fc{:       System.out.println("import java.io.*;");
+                                                        System.out.println("\n\npublic class Main {");
+                                                        System.out.println("\t public static void main(String[] args) {");
+                                                        System.out.println(fc);
+                                                        System.out.println("\t}");
+                                                        System.out.println(fd);
+                                                        System.out.println("}");:}
+        
+        | functionDefinition:fd main: m {:      System.out.println("import java.io.*;");
+                                                System.out.println("\n\npublic class Main {");
+                                                System.out.println("\t public static void main(String[] args) {");
+                                                System.out.println("\t"+ m);
+                                                System.out.println("\t}");
+                                                System.out.println(fd);
+                                                System.out.println("}");:}
+        
+        | functionCall:fc main:m {:     System.out.println("import java.io.*;");
+                                        System.out.println("\n\npublic class Main {");
+                                        System.out.println("\t public static void main(String[] args) {");
+                                        System.out.println(fc);
+                                        System.out.println("\t  "+m);
+                                        System.out.println("\t}");
+                                        System.out.println("}");:}
+
+        | main:m functionCall:fc{:      System.out.println("import java.io.*;");
+                                        System.out.println("\n\npublic class Main {");
+                                        System.out.println("\t public static void main(String[] args) {");
+                                        System.out.println("\t  "+m);
+                                        System.out.println(fc);
+                                        System.out.println("\t}");
+                                        System.out.println("}");:}
+        
+        | functionCall:fc functionDefinition:fd {:      System.out.println("import java.io.*;");
+                                                        System.out.println("\n\npublic class Main {");
+                                                        System.out.println("\t public static void main(String[] args) {");
+                                                        System.out.println(fc);
+                                                        System.out.println("\t}");
+                                                        System.out.println(fd);
+                                                        System.out.println("}");:}
+
+        | functionCall:fc functionDefinition:fd main:m {:       System.out.println("import java.io.*;");
+                                                                System.out.println("\n\npublic class Main {");
+                                                                System.out.println("\t public static void main(String[] args) {");
+                                                                System.out.println(fc);
+                                                                System.out.println("\n\t"+ m);
+                                                                System.out.println("\t}");
+                                                                System.out.println(fd);
+                                                                System.out.println("}");:}
+        
+        | functionCall:fc main:m functionDefinition:fd {:       System.out.println("import java.io.*;");
+                                                                System.out.println("\n\npublic class Main {");
+                                                                System.out.println("\t public static void main(String[] args) {");
+                                                                System.out.println(fc);
+                                                                System.out.println("\n\t"+ m);
+                                                                System.out.println("\t}");
+                                                                System.out.println(fd);
+                                                                System.out.println("}");:}
+
+        | main:m functionDefinition:fd {:       System.out.println("import java.io.*;");
+                                                System.out.println("\n\npublic class Main {");
+                                                System.out.println("\t public static void main(String[] args) {");
+                                                System.out.println("\t  "+m);
+                                                System.out.println("\t}");
+                                                System.out.println(fd);
+                                                System.out.println("}");:}
+        
+        | functionDefinition:fd {:      System.out.println("import java.io.*;");
+                                        System.out.println("\n\npublic class Main {");
+                                        System.out.println("\tpublic static void main(String[] args) {");
+                                        System.out.println("\t}");
+                                        System.out.println(fd);
+                                        System.out.println("}");:}
+        
+        | functionCall :fc {:   System.out.println("import java.io.*;");
+                                System.out.println("\n\npublic class Main {");
+                                System.out.println("\t public static void main(String[] args) {");
+                                System.out.println(fc);
+                                System.out.println("\t}");
+                                System.out.println("}"); :}
+        
+        | main :m {:    System.out.println("import java.io.*;");
+                        System.out.println("\n\npublic class Main {");
+                        System.out.println("\t public static void main(String[] args) {");
+                        System.out.println("\n\t\t"+ m);
+                        System.out.println("\t }");
+                        System.out.println("}");:}
+        
+        | {:    System.out.println("import java.io.*;");
+                System.out.println("\n\npublic class Main {");
+                System.out.println("\t public static void main(String[] args) {");
+                System.out.println("\t }");
+                System.out.println("}");:}
+        
+;
+
+functionDefinition ::= functionDefinition: fd function: f {: RESULT = fd + "\n\n" + f; :}
+                    | function: f {: RESULT = f; :}
+;
+
+functionCall ::= functionCall: fc printcall: c {:RESULT = fc + "\n\n" + c;:}
+            |   printcall: c {: RESULT = c; :}
+                              
+;                       
+
+printcall ::= call :c {: RESULT = "\t\t System.out.println("+ c + "));";:}
+;
+
+call ::= IDENTIFIER: id LPAREN RPAREN {: RESULT = id + "(";:}
+        | IDENTIFIER: id LPAREN carguments:ca RPAREN {:RESULT = id + "("+ ca;:}
+;
+
+carguments ::= type: t {: RESULT = t; :}
+            | type: t COMMA carguments: ts {: RESULT = t + ", " + ts ; :}
+;
+
+
+main::= main:m STRING_LITERAL: str{:RESULT =  m  + "\n\n" + "\t\t System.out.println(" + "\"" + str + "\"" + ");";:}
+        |STRING_LITERAL:str {:RESULT= "\tSystem.out.println(" + "\"" + str + "\"" + ");"; :}
+        |main:m concatenationMain:c {:RESULT =  m  + "\n\n" + "\t\t System.out.println(" + c + ");";:}
+        |concatenationMain :c{:RESULT= "\tSystem.out.println(" + c + ");"; :}
+        |main:m reverseMain:r{:RESULT =  m  + "\n\n" + "\t\t System.out.println(" + r + ");";:}
+        |reverseMain :r{:RESULT= "\tSystem.out.println(" + r + ");";:}
+        |main:m ifstatementMain:ifm{:RESULT =  m  + "\n\n" + "\t\t System.out.println((" + ifm + "));";:}
+        |ifstatementMain :ifm{:RESULT= " \tSystem.out.println(" + ifm + ");";:}
+;
+
+type ::= STRING_LITERAL: str {: RESULT = "\"" + str + "\""; :}
+        |call: id {: RESULT = id + ")";:}
+        |concatenationMain:c {: RESULT = c; :}
+        |ifstatementMain:ifm {: RESULT = ifm; :}
+        |reverseMain:r {:RESULT = r;:}
+;
+
+ifstatementMain ::= IF LPAREN expressionMain:e RPAREN type : f1 ELSE type:f2 {:RESULT="(" + e + "?" + f1 + ":" + f2 + ")";:}
+;
+
+expressionMain::= type : f1 PREFIX type: f2 {:RESULT="("+ f2 +")" + ".startsWith(" + f1 + ")";:}
+;
+
+concatenationMain ::= type : f1 PLUS type: f2 {:RESULT=f1 + "+" + f2;:}
+;
+
+reverseMain ::= REVERSE type: f {:RESULT = "new StringBuffer(" + f+").reverse().toString()";:}
+;
+
+function ::= IDENTIFIER: id LPAREN RPAREN LBRACE functionCode: fc RBRACE {: RESULT = "\tpublic static String " 
+                                                                            + id + "()" + "{" + "\n\t\treturn" 
+                                                                            + "\t" + fc + ";" + "\n\t}"; :}
+            | IDENTIFIER: id LPAREN darguments: ar RPAREN LBRACE functionCode: fc RBRACE {: RESULT = "\tpublic static String " 
+                                                                                            + id + "(" + ar + ")" + "{" + 
+                                                                                            "\n\t\treturn"  + "\t" + fc + ";" + "\n \t}"; :}
+;
+
+darguments ::= identifierType: id {: RESULT = id; :}
+            | identifierType: id COMMA darguments: ids {: RESULT = id + ", " + ids ; :}
+;
+
+
+identifierType ::= IDENTIFIER: id {: RESULT = "String " + id; :}
+;
+
+functionCode ::= STRING_LITERAL: str {: RESULT = "\"" + str + "\""; :}
+                | concatenation: c {: RESULT = c; :}
+                | IDENTIFIER:id {:RESULT = id;:}
+                | functionCallufunction: fc {: RESULT = fc ;:}
+                | ifstatement : ifs {: RESULT = ifs ;:}
+                | reverse : r {: RESULT = r;:}
+;
+
+reverse ::= REVERSE functionCode: f {:RESULT = "new StringBuffer(" + f+").reverse().toString()";:}
+;
+
+ifstatement ::= IF LPAREN expression:e RPAREN functionCode : f1 ELSE functionCode :f2 {:RESULT= "(" + "(" + e + ")?" + f1 + " : " + f2 + ")";:}
+;
+
+expression ::= functionCode : f1 PREFIX functionCode: f2 {:RESULT=f2 + ".startsWith(" + f1 + ")";:}
+;
+
+functionCallufunction ::= IDENTIFIER: id LPAREN RPAREN {: RESULT = id + "()"; :}
+                | IDENTIFIER: id LPAREN farguments:ca RPAREN {: RESULT = id + "("+ ca; :}
+;
+
+farguments ::= ftype: t {: RESULT = t + ")";:}
+            | ftype: t COMMA farguments: ts {: RESULT = t + ", " + ts ; :}
+;
+
+ftype ::= functionCode:f {:RESULT = f;:}
+;
+
+concatenation ::= functionCode : f1 PLUS functionCode: f2 {:RESULT=f1 + "+" + f2;:}
+;
